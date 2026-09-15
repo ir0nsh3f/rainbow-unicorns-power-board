@@ -36,6 +36,8 @@ jobs:
         run: python scripts/export_site.py upstream
       - name: Test public asset syntax and scope
         run: |
+          node --test tests/*.test.cjs
+          node --check site/rainbow-schedule.js
           node --check site/app.js
           node --check site/schedules.js
           node --check site/league-schedule.js

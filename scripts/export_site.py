@@ -28,6 +28,10 @@ def export(source,out,sha):
  pure='  const key='+segment(s,'  const key=','  const favorites=')+'  const favorites={};\n  function buildRows'+segment(s,'  function buildRows','  function projectionFor')
  renderer='  function renderRows'+segment(s,'  function renderRows','  function projectionGuide')
  renderer=renderer.replace('${projectionLine(r,options)}','').replace('${lastPregameDetail(r,options.pregameResults)}','').replace('${projectionLine(r,options,true)}','')
+ # Dedicated season view labels all unplayed states; default league rendering stays unchanged.
+ status="${r.status==='Awaiting result'?' · Awaiting result':''}"
+ assert renderer.count(status)==1
+ renderer=renderer.replace(status,"${options.showStatus&&!r.completed?' · '+e(r.status):r.status==='Awaiting result'?' · Awaiting result':''}")
  (out/'league-schedule.js').write_text("(function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory(require('./schedules.js'),require('./ratings.js'));else root.SBMSALeagueSchedule=factory(root.SBMSASchedules,root.SBMSARatings);})(globalThis,function(S,R){\n"+pure+renderer+'\nreturn {buildRows,filterRows,renderRows,highlight};});\n')
  # Exact copies preserve original capture/receipt hashes and original observation provenance.
  shutil.copytree(source/'site/soccer-projections',out/'soccer-projections',dirs_exist_ok=True)
