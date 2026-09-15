@@ -7,7 +7,7 @@ def segment(text,start,end):
  assert text.count(start)==1 and text.count(end)==1
  return text.split(start,1)[1].split(end,1)[0]
 def export(source,out,sha):
- source=Path(source);out=Path(out);out.mkdir(parents=True,exist_ok=True)
+ source=Path(source).resolve();out=Path(out);out.mkdir(parents=True,exist_ok=True)
  subprocess.run([sys.executable,str(source/'scripts/soccer_projections.py'),'validate'],check=True,cwd=source)
  data=json.loads((source/'site/data.json').read_text())
  ds=[d for d in data['divisions'] if d['sport']=='5ug']

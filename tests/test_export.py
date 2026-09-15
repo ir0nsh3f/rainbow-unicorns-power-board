@@ -3,7 +3,7 @@ from pathlib import Path
 from scripts.export_site import export
 class ExportTest(unittest.TestCase):
  def test_only_5ug_and_exact_immutable_provenance(self):
-  source=Path('/workspace/sbmsa-power-board') if Path('/workspace/sbmsa-power-board').exists() else Path('upstream')
+  source=Path('upstream') if Path('upstream').exists() else Path('/workspace/sbmsa-power-board')
   with tempfile.TemporaryDirectory() as tmp:
    out=Path(tmp);export(source,out,'test-source-sha')
    d=json.loads((out/'data.json').read_text());self.assertEqual({(x['sport'],x['division']) for x in d['divisions']},{('5ug','Akers'),('5ug','Boxx')});self.assertEqual(sum(len(x['teams']) for x in d['divisions']),24)
