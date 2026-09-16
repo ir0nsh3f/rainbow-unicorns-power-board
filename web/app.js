@@ -1,12 +1,12 @@
 'use strict';
 const $=id=>document.getElementById(id),e=SBMSASchedules.escapeHTML;
 let data=null,view='rainbow-unicorns',filter='Upcoming';
-const fmt=n=>(n>0?'+':'')+Number(n.toFixed(2));
+const fmt=n=>n===null?'—':(n>0?'+':'')+Number(n.toFixed(2));
 function render(){if(!data)return;
  const all=SBMSARatings.compute(data.divisions,'5ug',data.ratingMode||'raw'),division=$('division').value,q=$('search').value.trim().toLowerCase();
  const shown=all.filter(t=>(division==='all'||t.division===division)&&(t.team+' '+(t.coach||'')).toLowerCase().includes(q));
  $('count').textContent=shown.length+' / '+all.length+' teams';
- $('rows').innerHTML=shown.map(t=>{const followed=t.division==='Boxx'&&t.team==='Rainbow Unicorns',margin=(data.ratingMode==='capped'?t.capped_margin_sum:t.margin_sum)/t.gp;return `<div class="row ${followed?'favorite':''}" data-team="${e(t.team)}" data-division="${e(t.division)}" data-rank="${t.rank||''}"><span class="rank">${t.rank?t.rankText:'—'}</span><div><div class="team">${e(t.team)}${followed?'<span class="chip" aria-label="Followed team" title="Followed team">●</span>':''}</div><div class="coach">Coach: ${e(t.coach||'Not listed')}</div><div class="division">${e(t.division)} · ${t.gp?t.gp+' played':'Unrated'}</div></div><span class="record">${t.w}–${t.l}–${t.t}</span><span class="result">${t.gp?fmt(margin):'—'}</span><span class="diff ${t.power>=0?'pos':'neg'}">${t.power===null?'—':fmt(t.power)}</span></div>`;}).join('')||'<p>No teams match.</p>';
+ $('rows').innerHTML=shown.map(t=>{const followed=t.division==='Boxx'&&t.team==='Rainbow Unicorns',scoredGP=t.scored_gp??t.gp,margin=scoredGP?(data.ratingMode==='capped'?t.capped_margin_sum:t.margin_sum)/scoredGP:null;return `<div class="row ${followed?'favorite':''}" data-team="${e(t.team)}" data-division="${e(t.division)}" data-rank="${t.rank||''}"><span class="rank">${t.rank?t.rankText:'—'}</span><div><div class="team">${e(t.team)}${followed?'<span class="chip" aria-label="Followed team" title="Followed team">●</span>':''}</div><div class="coach">Coach: ${e(t.coach||'Not listed')}</div><div class="division">${e(t.division)} · ${t.rank?t.gp+' played':'Unrated'}${t.outcome_only_gp?` · ${scoredGP} scored / ${t.gp} GP · score unavailable`:''}</div></div><span class="record">${t.w}–${t.l}–${t.t}</span><span class="result">${fmt(margin)}</span><span class="diff ${t.power>=0?'pos':'neg'}">${t.power===null?'—':fmt(t.power)}</span></div>`;}).join('')||'<p>No teams match.</p>';
  const games=SBMSALeagueSchedule.filterRows(SBMSALeagueSchedule.buildRows(data,'5ug'),{division,query:q,filter});$('schedule-count').textContent=games.length+' fixtures';$('schedule-rows').innerHTML=SBMSALeagueSchedule.renderRows(games);
  const rainbow=SBMSARainbowSchedule.buildRows(data);
  $('rainbow-schedule-count').textContent=rainbow.length+' fixtures · '+rainbow.filter(r=>r.completed).length+' final · '+rainbow.filter(r=>!r.completed).length+' unplayed';
