@@ -27,6 +27,13 @@ assert.match(nodes.rows.innerHTML,/0?1 scored \/ 2 GP/);assert.match(nodes.rows.
    out=Path(tmp);export(source,out,'test-source-sha')
    d=json.loads((out/'data.json').read_text());self.assertEqual({(x['sport'],x['division']) for x in d['divisions']},{('5ug','Akers'),('5ug','Boxx')});self.assertEqual(sum(len(x['teams']) for x in d['divisions']),24)
    p=json.loads((out/'soccer-projections/current.json').read_text());self.assertEqual(p['model']['prior_games'],3)
+   self.assertEqual(p['model']['sport'],'5ug')
+   for age in ('8u','6u'):self.assertFalse((out/('soccer-projections-'+age)).exists())
+   for capture in (out/'soccer-projections/captures').glob('*.json'):
+    c=json.loads(capture.read_text());self.assertEqual(c['model']['sport'],'5ug')
+    self.assertTrue(all(f['fixture_id'][1]=='5ug' for f in c['forecasts']))
+   for receipt in (out/'soccer-projections/publication').glob('*.json'):
+    self.assertEqual(json.loads(receipt.read_text())['sport'],'5ug')
    for file in (source/'site/soccer-projections').rglob('*.json'):self.assertEqual(file.read_bytes(),(out/'soccer-projections'/file.relative_to(source/'site/soccer-projections')).read_bytes())
    for file in out.rglob('*'):
     if file.is_file():self.assertNotRegex(file.read_text(),r'Dexter|Beckham|Buccaneers|Arsenal|Vipers')
