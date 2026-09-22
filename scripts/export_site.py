@@ -12,7 +12,8 @@ def export(source,out,sha):
  data=json.loads((source/'site/data.json').read_text())
  ds=[d for d in data['divisions'] if d['sport']=='5ug']
  assert {(d['sport'],d['division']) for d in ds}=={('5ug','Akers'),('5ug','Boxx')}
- assert all(len(d['teams'])==12 and len(d['schedule'])==66 for d in ds)
+ # Official Boxx adds a 67th fixture (verified against live ScheduleGrid); roster stays 12.
+ assert all(len(d['teams'])==12 and len(d['schedule'])=={'Akers':66,'Boxx':67}[d['division']] for d in ds)
  # Scope metadata explicitly; do not export other divisions or their error messages.
  scoped={k:data[k] for k in ('last_checked','last_successful_check','data_updated','status')}
  scoped.update(divisions=ds,errors=[] if data['status']=='ok' else ['Upstream source check failed; retained last accepted 5U results.'])

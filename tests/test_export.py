@@ -14,6 +14,12 @@ const g={home:'Rainbow Unicorns',away:'Other',home_score:null,away_score:null,ho
 const d={divisions:[{sport:'5ug',division:'Boxx',teams:[t('Rainbow Unicorns',1,1),t('Other',1,1)],games:[{home:g.home,away:g.away,home_score:4,away_score:1}],schedule:[g]}]};
 const rows=L.buildRows(d,'5ug');assert.equal(rows[0].completed,true);assert.match(L.renderRows(rows,{showStatus:true}),/Other W – Rainbow Unicorns L · score unavailable/);
 assert.equal(Rainbow.nextTwo(d.divisions,Date.parse('2026-09-16T12:00:00Z')).length,0);
+for(const ratingMode of ['raw','capped']){
+ const ranked=L.buildRows({...d,ratingMode},'5ug');
+ const html=L.renderRows(ranked,{showStatus:true});
+ for(const t of [ranked[0].away,ranked[0].home])assert.ok(html.includes(`>#${t.rank}</span> ${t.team}</b>`));
+}
+assert.ok(!fs.existsSync(root+'/schedule-links.js'));
 const nodes=new Proxy({}, {get(o,k){return o[k]||(o[k]={value:k==='division'?'all':'',textContent:'',innerHTML:''});}});
 const context={document:{getElementById:id=>nodes[id]},SBMSASchedules:S,SBMSARatings:R,SBMSALeagueSchedule:L,SBMSARainbowSchedule:{buildRows:()=>rows},SBMSARainbow:{render:()=>{}},fixture:d};
 vm.createContext(context);vm.runInContext(fs.readFileSync(root+'/app.js','utf8').split('function setView')[0]+';data=fixture;render();',context);
