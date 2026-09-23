@@ -29,6 +29,7 @@ def export(source,out,sha):
  pure='  const key='+segment(s,'  const key=','  const favorites=')+'  const favorites={};\n  function buildRows'+segment(s,'  function buildRows','  function projectionFor')
  renderer='  function renderRows'+segment(s,'  function renderRows','  function projectionGuide')
  renderer=renderer.replace('${projectionLine(r,options)}','').replace('${lastPregameDetail(r,options.pregameResults)}','').replace('${projectionLine(r,options,true)}','')
+ renderer=renderer.replace('Try All or turn off Watchlist.','Try All.')
  # Dedicated season view labels all unplayed states; default league rendering stays unchanged.
  status="${r.status==='Awaiting result'?' · Awaiting result':''}"
  assert renderer.count(status)==1

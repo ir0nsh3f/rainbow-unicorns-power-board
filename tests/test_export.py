@@ -19,9 +19,9 @@ for(const ratingMode of ['raw','capped']){
  const html=L.renderRows(ranked,{showStatus:true});
  for(const t of [ranked[0].away,ranked[0].home])assert.ok(html.includes(`>#${t.rank}</span> ${t.team}</b>`));
 }
-assert.ok(!fs.existsSync(root+'/schedule-links.js'));
+assert.ok(fs.existsSync(root+'/schedule-links.js'));
 const nodes=new Proxy({}, {get(o,k){return o[k]||(o[k]={value:k==='division'?'all':'',textContent:'',innerHTML:''});}});
-const context={document:{getElementById:id=>nodes[id]},SBMSASchedules:S,SBMSARatings:R,SBMSALeagueSchedule:L,SBMSARainbowSchedule:{buildRows:()=>rows},SBMSARainbow:{render:()=>{}},fixture:d};
+const context={document:{getElementById:id=>nodes[id]},SBMSAScheduleLinks:require(root+'/schedule-links.js'),SBMSASchedules:S,SBMSARatings:R,SBMSALeagueSchedule:L,SBMSARainbowSchedule:{buildRows:()=>rows},SBMSARainbow:{render:()=>{}},fixture:d};
 vm.createContext(context);vm.runInContext(fs.readFileSync(root+'/app.js','utf8').split('function setView')[0]+';data=fixture;render();',context);
 assert.match(nodes.rows.innerHTML,/0?1 scored \/ 2 GP/);assert.match(nodes.rows.innerHTML,/class="result">\+3</);assert.doesNotMatch(nodes.rows.innerHTML,/NaN|Infinity/);
 '''
