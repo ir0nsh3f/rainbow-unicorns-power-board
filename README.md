@@ -16,6 +16,6 @@ The public `ir0nsh3f/sbmsa-power-board` collector continues checking all officia
 
 Tests: `python -m unittest discover -s tests -v`; after export, `node --test tests/*.test.cjs`; browser `tests/ui.cjs` and `tests/rainbow-schedule-ui.cjs` with Playwright, optional `TEST_URL` and `PLAYWRIGHT_MODULE`. Local source at `upstream/` or `/workspace/sbmsa-power-board`. Generated `site/` and upstream checkout are ignored, not independently edited/committed results.
 
-Current forecast `5ug-gamma-poisson-v2` uses three prior games; immutable v1 uses eight. Raw power remains opponent-ridge-margin-v3, ridge3; optional3-goal cap is user-selected, never automatic.
+Current forecast `5ug-gamma-poisson-v2` uses three prior games; immutable v1 uses eight. Power remains opponent-ridge-margin-v3, ridge3. Capped per-game inputs (±3 goals) are selected on fresh loads; Raw remains available and the selection survives in-page navigation across rankings, league schedule, full Rainbow schedule and next-two rank context. This is only a browser preference: upstream historical v3 series continue their Raw capture convention; no history or forecast parameters change.
 
 Review2026-11-30 and before season change. Preserve historical capture and receipt bytes. Source structural changes fail export closed rather than silently weakening scope or archive validation.
