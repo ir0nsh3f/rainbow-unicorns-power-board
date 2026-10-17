@@ -8,7 +8,7 @@ def segment(text,start,end):
  return text.split(start,1)[1].split(end,1)[0]
 def export(source,out,sha):
  source=Path(source).resolve();out=Path(out);out.mkdir(parents=True,exist_ok=True)
- subprocess.run([sys.executable,str(source/'scripts/soccer_projections.py'),'validate'],check=True,cwd=source)
+ subprocess.run([sys.executable,'-c',"from scripts.soccer_projections import validate; validate('site')"],check=True,cwd=source)
  data=json.loads((source/'site/data.json').read_text())
  ds=[d for d in data['divisions'] if d['sport']=='5ug']
  assert {(d['sport'],d['division']) for d in ds}=={('5ug','Akers'),('5ug','Boxx')}
@@ -16,7 +16,14 @@ def export(source,out,sha):
  assert all(len(d['teams'])==12 and len(d['schedule'])=={'Akers':66,'Boxx':69}[d['division']] for d in ds)
  # Scope metadata explicitly; do not export other divisions or their error messages.
  scoped={k:data[k] for k in ('last_checked','last_successful_check','data_updated','status')}
- scoped.update(divisions=ds,errors=[] if data['status']=='ok' else ['Upstream source check failed; retained last accepted 5U results.'])
+ if 'division_status' in data:
+  coverage={k:v for k,v in data['division_status'].items() if k.startswith('5ug|')}
+  assert set(coverage)=={'5ug|Akers','5ug|Boxx'}
+  assert all(v['status']=='ok' and not v['error'] for v in coverage.values()), '5U source invalid; retain previous public export'
+  stamps={v['last_successful_check'] for v in coverage.values()}
+  assert len(stamps)==1 and None not in stamps
+  scoped.update(status='ok',last_successful_check=stamps.pop(),data_updated=max(v['data_updated'] for v in coverage.values()),division_status=coverage)
+ scoped.update(divisions=ds,errors=[] if scoped['status']=='ok' else ['Upstream source check failed; retained last accepted 5U results.'])
  (out/'data.json').write_text(json.dumps(scoped,ensure_ascii=False,separators=(',',':'))+'\n')
  for name in ('ratings.js','rainbow.js','league-schedule.css'):
   shutil.copyfile(source/'site'/name,out/name)
@@ -40,7 +47,7 @@ def export(source,out,sha):
  method=(source/'site/soccer-method.html').read_text().replace(' and flag projections','').replace(' or flag histories',' histories').replace('; the existing flag evaluator is unchanged','')
  (out/'soccer-method.html').write_text(method)
  for file in (ROOT/'web').iterdir():shutil.copyfile(file,out/file.name)
- receipt={'exported_at':datetime.now(timezone.utc).isoformat(),'source_commit':sha,'source_repository':'https://github.com/ir0nsh3f/sbmsa-power-board','source_checked_at':data['last_successful_check'],'archive_provenance':'Copies retain original capture bytes and original observed-public receipts; this export does not claim a new first publication.'}
+ receipt={'exported_at':datetime.now(timezone.utc).isoformat(),'source_commit':sha,'source_repository':'https://github.com/ir0nsh3f/sbmsa-power-board','source_checked_at':scoped['last_successful_check'],'archive_provenance':'Copies retain original capture bytes and original observed-public receipts; this export does not claim a new first publication.'}
  (out/'export.json').write_text(json.dumps(receipt,indent=2)+'\n')
  return scoped
 if __name__=='__main__':

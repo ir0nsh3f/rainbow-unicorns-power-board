@@ -2,6 +2,20 @@ import json,unittest,tempfile,hashlib
 from pathlib import Path
 from scripts.export_site import export
 class ExportTest(unittest.TestCase):
+ def test_partial_boys_failure_exports_fresh_girls_and_rejects_own_failure(self):
+  import shutil
+  source=Path('upstream') if Path('upstream').exists() else Path('/workspace/sbmsa-power-board')
+  with tempfile.TemporaryDirectory() as tmp:
+   root=Path(tmp)/'source';shutil.copytree(source/'scripts',root/'scripts');shutil.copytree(source/'site',root/'site')
+   d=json.loads((root/'site/data.json').read_text());stamp=d.get('division_status',{}).get('5ug|Boxx',{}).get('last_successful_check',d['last_successful_check'])
+   d.update(status='partial',errors=['6u source mismatch'],division_status={x['sport']+'|'+x['division']:dict(status='ok' if x['sport']=='5ug' else 'error',last_checked=d['last_checked'],last_successful_check=stamp,data_updated=d['data_updated'],error=None if x['sport']=='5ug' else 'mismatch') for x in d['divisions']})
+   (root/'site/data.json').write_text(json.dumps(d));out=Path(tmp)/'out'
+   scoped=export(root,out,'partial-test');self.assertEqual(scoped['status'],'ok');self.assertEqual(scoped['errors'],[]);self.assertEqual(scoped['last_successful_check'],stamp)
+   self.assertEqual(json.loads((out/'export.json').read_text())['source_checked_at'],stamp)
+   before=(out/'data.json').read_bytes();d['division_status']['5ug|Boxx']['status']='error';(root/'site/data.json').write_text(json.dumps(d))
+   with self.assertRaises((ValueError,AssertionError,__import__('subprocess').CalledProcessError)):export(root,out,'bad-own-source')
+   self.assertEqual((out/'data.json').read_bytes(),before)
+
  def test_outcome_only_shared_renderer_and_ranking_denominator(self):
   import subprocess
   source=Path('upstream') if Path('upstream').exists() else Path('/workspace/sbmsa-power-board')
