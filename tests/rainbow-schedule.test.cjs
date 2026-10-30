@@ -4,6 +4,8 @@ const source=JSON.parse(fs.readFileSync(require('node:path').join(__dirname,'../
 test('entire season selects only exact 5ug / Boxx / Rainbow Unicorns in chronological order',()=>{
  const S=require('../web/rainbow-schedule.js');
  const d=structuredClone(source),box=d.divisions.find(d=>d.division==='Boxx');
+ // Deterministic pending-state fixture even after the live regular season finishes.
+ const pending=box.schedule.findLast(g=>[g.home,g.away].includes('Rainbow Unicorns'));pending.home_score=pending.away_score=null;delete pending.home_outcome;delete pending.away_outcome;
  const expected=box.schedule.flatMap((g,i)=>[g.home,g.away].includes('Rainbow Unicorns')?[JSON.stringify(['5ug','Boxx',i])]:[]);
  d.divisions.push({...structuredClone(box),sport:'other'}, {...structuredClone(box),division:'Other'});
  const rows=S.buildRows(d,'2026-09-15');

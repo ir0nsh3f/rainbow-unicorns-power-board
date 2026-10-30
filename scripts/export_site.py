@@ -25,8 +25,12 @@ def export(source,out,sha):
   scoped.update(status='ok',last_successful_check=stamps.pop(),data_updated=max(v['data_updated'] for v in coverage.values()),division_status=coverage)
  scoped.update(divisions=ds,errors=[] if scoped['status']=='ok' else ['Upstream source check failed; retained last accepted 5U results.'])
  (out/'data.json').write_text(json.dumps(scoped,ensure_ascii=False,separators=(',',':'))+'\n')
- for name in ('ratings.js','rainbow.js','league-schedule.css'):
+ for name in ('ratings.js','rainbow.js','league-schedule.css','playoffs.js','playoffs.css'):
   shutil.copyfile(source/'site'/name,out/name)
+ postseason=json.loads((source/'site/playoffs.json').read_text())
+ postseason['sources']=[s for s in postseason['sources'] if s['sport']=='5ug']
+ assert len(postseason['sources'])==3
+ (out/'playoffs.json').write_text(json.dumps(postseason,ensure_ascii=False,separators=(',',':'))+'\n')
  css=segment((source/'site/index.html').read_text(),'<style>','</style>')
  (out/'board.css').write_text(css+'\n')
  s=(source/'site/schedules.js').read_text()
