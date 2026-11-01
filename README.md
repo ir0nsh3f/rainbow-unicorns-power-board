@@ -4,9 +4,13 @@ Public site: https://ir0nsh3f.github.io/rainbow-unicorns-power-board/
 
 This site presents only Fall2026 5U Girls Akers and Boxx: rankings, full schedules, the next two Rainbow Unicorns fixtures, and a dedicated [Rainbow schedule](https://ir0nsh3f.github.io/rainbow-unicorns-power-board/#rainbow-schedule) tab for the entire season (exact 5ug / Boxx / Rainbow Unicorns). The season tab retains finals and all unplayed fixtures chronologically, independent of league filters, using shared CT times, official maps and current-season ranks/records. There are no individual-player profiles or family associations.
 
+## Full-season power
+
+Verified numeric 5U playoff results now count equally with regular-season games in the shared ridge3 power fit, including exact cross-division opponents. Cap3 stays the default and Raw remains available. Every ranking/schedule/playoff rank uses the same combined inputs. Regular W–L–T, GP, scoring statistics, forecast inputs and immutable history stay separate and unchanged. The compact coverage/division comparison discloses exclusions, retained/stale sources, connectivity and selection bias. The existing scheduled export supplies only the three 5U playoff feeds; no second collector or forecast fit.
+
 ## One source of truth
 
-The public `ir0nsh3f/sbmsa-power-board` collector continues checking all official divisions atomically. Its original user interface excludes5U; retained historical archives are not deleted. This repository does **not** collect scores or fit a second forecasting model.
+The public `ir0nsh3f/sbmsa-power-board` collector continues checking and validating each official division independently. Its original user interface excludes5U; retained historical archives are not deleted. This repository does **not** collect scores or fit a second forecasting model.
 
 `python scripts/export_site.py upstream` validates the upstream soccer archive, exports only5U division data, copies canonical ratings and next-two renderer, and extracts only the shared schedule helpers needed here. All soccer captures and receipts are exact-byte copies, with their original observed-public timestamps and workflow URLs. Exporting them here does not create a new first-public observation. `site/export.json` records the upstream commit and actual export time separately from accepted source timestamps.
 
